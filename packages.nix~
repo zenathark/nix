@@ -1,0 +1,94 @@
+# file: packages.nix
+# author: zenathark
+
+{ config, pkgs, ... }:
+
+{
+  environment.systemPackages = with pkgs; [
+    # KDE apps
+    kdeApplications.kmix
+    kdeFrameworks.kmediaplayer
+    kdeApplications.okular
+    amarok
+    gwenview
+    krita
+    kdeApplications.spectacle
+    ktorrent
+    ark
+    kcalc
+    kate
+    libsForQt5.fcitx-qt5
+
+    # Development
+    emacs
+    python
+    ruby_2_4
+    perl
+    ack
+    go
+    nodejs
+    ghc
+    rustc
+    jdk
+    leiningen
+    boot
+    sbt
+    gcc
+    automake
+    cmake
+    gnumake
+    extra-cmake-modules
+    # julia_05
+    mozart
+    sqlite
+    sbcl
+    gnuplot_qt
+    qemu
+    docker
+    opencv3
+    llvm
+    llvmPackages.libcxxClang
+
+    # Videogame dev
+    godot
+    SDL
+
+    # TeX
+    aspell
+    aspellDicts.en
+    aspellDicts.es
+    texlive.combined.scheme-medium
+    global
+
+    # fonts
+    font-awesome-ttf
+    source-code-pro
+    fira-code
+    fira-mono
+    fira
+    hack-font
+    vistafonts
+    lato
+
+    #office
+    libreoffice
+
+    # Games
+    wineStaging
+    winetricks
+    steam
+
+    # Extra
+    nix-zsh-completions
+    gimp
+    inkscape
+    ffmpeg-full
+    zip
+    blender
+    discord
+  ];
+  # emacs config
+  services.emacs.defaultEditor = true;
+  services.emacs.enable = true;
+  services.emacs.install = true;
+}

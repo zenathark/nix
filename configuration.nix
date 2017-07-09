@@ -1,0 +1,115 @@
+# Edit this configuration file to define what should be installed on
+# your system.  Help is available in the configuration.nix(5) man page
+# and in the NixOS manual (accessible by running ‘nixos-help’).
+
+{ config, pkgs, ... }:
+
+{
+  imports =
+    [ # Include the results of the hardware scan.
+      ./hardware-configuration.nix
+      # Extra system-wide packages
+      ./packages.nix
+    ];
+
+  # Use the systemd-boot EFI boot loader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.timeout = 3;
+
+  networking.hostName = "nix-ivallice"; # Define your hostname.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.networkmanager.enable = true;
+
+  # Select internationalisation properties.
+  i18n = {
+    consoleFont = "Lat2-Terminus16";
+    consoleKeyMap = "dvorak-programmer";
+    defaultLocale = "en_US.UTF8";
+    inputMethod = {
+      enabled = "fcitx";
+      fcitx.engines = with pkgs.fcitx-engines; [mozc table-other m17n];
+    };
+  };
+
+  # Set your time zone.
+  time.timeZone = "Mexico/General";
+
+  # List packages installed in system profile. To search by name, run:
+  # $ nix-env -qaP | grep wget
+  environment.systemPackages = with pkgs; [
+    wget zile git zsh microcodeIntel konsole plasma-nm firefox glxinfo
+  ];
+
+  # List services that you want to enable:
+
+  # Enable the OpenSSH daemon.
+  # services.openssh.enable = true;
+
+  # Open ports in the firewall.
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  # networking.firewall.enable = false;
+
+  # Enable CUPS to print documents.
+  # services.printing.enable = true;
+
+  # Enable the X11 windowing system.
+  services.xserver.enable = true;
+  services.xserver.layout = "us";
+  services.xserver.xkbVariant = "dvp";
+  services.xserver.xkbOptions = "eurosign:e, ctrl:swapcaps";
+  nixpkgs.config.allowUnfree = true;
+
+  # Enable the KDE Desktop Environment.
+  services.xserver.displayManager.sddm.enable = true;
+  services.xserver.desktopManager.plasma5.enable = true;
+  services.xserver.videoDrivers = [ "nvidia" ];
+  services.xserver.screenSection = ''
+    Option "metamodes" "DVI-I-1: nvidia-auto-select +0+0 {ForceCompositionPipeline=On}, DVI-D-0: nvidia-auto-select +1920+0 {ForceCompositionPipeline=On}"
+    Option "AllowIndirectGLXProtocol" "off"
+    Option "TripleBuffer" "On"        
+  '';
+  hardware.opengl.driSupport32Bit = true;
+  hardware.pulseaudio.support32Bit = true;
+  hardware.pulseaudio.enable = true;
+
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="28de", MODE="0666"
+    KERNEL=="uinput", MODE="0666", GROUP="users", OPTIONS+="static_node=uinput"
+  '';
+
+  # Define a user account. Don't forget to set a password with ‘passwd’.
+  users.extraUsers.zenathark = {
+    isNormalUser = true;
+    uid = 1000;
+    group = "zenathark";
+    extraGroups = ["wheel" "networkmanager"];
+    createHome = true;
+    home = "/home/zenathark";
+    shell = pkgs.zsh;
+    initialPassword = "media";
+  };
+ 
+  users.extraGroups.zenathark = {
+    gid = 1000;
+  };
+
+  programs.zsh = {
+    enable = true;
+    enableAutosuggestions = true;
+    enableCompletion = true;
+    syntaxHighlighting.enable = true;
+    ohMyZsh = {
+      enable = true;
+      theme = "norm";
+      plugins = ["git"];
+    };
+  };
+
+  boot.tmpOnTmpfs = true;
+  # The NixOS release to be compatible with for stateful data such as databases.
+  system.stateVersion = "17.03";
+
+}
